@@ -16,13 +16,11 @@ class FtpClient implements ClientInterface {
      * @throws Exception
      */
     public function __construct(string $login, string $pass, string $host, int $port) {
-
-        $ftp_server = 'ftp://' . $login . ':' . $pass . '@' . $host;
-
-        $this->connection_id = ftp_connect($ftp_server, $port);
+        $this->connection_id = ftp_connect($host, $port);
+        ftp_login($this->connection_id,$login, $pass);
 
         if (!$this->connection_id) {
-            throw new Exception("Не удалось установить соединение с $ftp_server");
+            throw new Exception("Не удалось установить соединение с $host");
         }
     }
 
@@ -39,7 +37,7 @@ class FtpClient implements ClientInterface {
      * @inheritdoc
      */
     public function download(string $remote_file_path, string $local_file_path) {
-        if (!ftp_get($this->connection_id, $remote_file_path, $local_file_path, FTP_BINARY)) {
+        if (!ftp_get($this->connection_id, $local_file_path, $remote_file_path, FTP_BINARY)) {
             throw new Exception("Не удалось скачать файл " . $remote_file_path);
         }
     }
@@ -53,7 +51,7 @@ class FtpClient implements ClientInterface {
         $current_dir = ftp_pwd($this->connection_id);
 
         if (!ftp_put($this->connection_id, $current_dir . '/' . $file_name, $local_file_path, FTP_BINARY)) {
-            throw new Exception("Не удалось скачать файл " . $remote_file_path);
+            throw new Exception("Не удалось загрузить файл " . $remote_file_path);
         }
     }
 
@@ -72,7 +70,7 @@ class FtpClient implements ClientInterface {
      * @inheritdoc
      */
     public function exec($commnad) {
-        $result = ftp_exec($this->connection_id , 'pwd');
+        $result = ftp_exec($this->connection_id , $commnad);
         if (!$result) {
             throw new Exception("Не удалось выполнить комманду");
         }

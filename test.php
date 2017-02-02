@@ -19,3 +19,19 @@ try
     echo $e->getMessage();
 
 }
+
+
+try
+{
+    $conn = $factory->getConnection('ftp', '', '', '', 21);
+    $conn->upload('/home/dev/111.txt');
+    $conn->download('111.txt', '/home/dev/222.txt');
+    $conn->cd('/zyro');
+    $conn->upload('/home/dev/111.txt');
+    $conn->close();
+
+}catch(Exception $e){
+
+    echo $e->getMessage();
+
+}
